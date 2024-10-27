@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+<!-- Comment Form 1 - Bootstrap Brain Component -->
+    <section class="bg-light py-3 py-md-5">
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-12 col-md-10 col-lg-8 col-xl-7 col-xxl-6">
+                    <h2 class="mb-4 display-5 text-center">Messages Page</h2>
+                    <p class="text-secondary mb-5 text-center">Good comments can help to make a post more informative and engaging, and they can also help to build community among readers.</p>
+                    <hr class="w-50 mx-auto mb-5 mb-xl-9 border-dark-subtle">
+                </div>
+            </div>
+        </div>
+
+        {% for message in messages %}
+            <div class="container">
+                <div class="row justify-content-lg-center">
+                    <div class="col-12 col-lg-9">
+                        <!-- Start of each message section -->
+                        <div class="bg-white border rounded shadow-sm overflow-hidden mb-4">
+                            <div class="p-4">
+                                {% if message.user == request.user %}
+                                <a href="{% url "delete-message" message.id %}">
+                                    <button class="btn btn-primary btn-sm mt-2 btn-danger">Delete</button>
+                                </a>
+                            {% endif %}
+                                <!-- Display centered message title -->
+                                <h4 class="fw-bold text-center text-success">{{ message.user.username|upper }}</h4>
+                                <h5 class="fw-bold text-center">{{ message.title }}</h5>
+                                <p class="text-muted">{{ message.content }}</p>
+            
+                                <!-- Like button for the message -->
+                                <div class="d-flex justify-content-start align-items-center">
+                                    <a href="{% url "message-likes" message.id %}" class="btn btn-outline-primary btn-sm me-2">
+                                        Like
+                                    </a>
+                                    <span>{{ message.likes.all.count }} Likes</span> <!-- Placeholder for number of likes -->
+                                </div>
+            
+                                <!-- Comments Section -->
+                                <div class="mt-4">
+                                    <h6 class="fw-bold">Comments</h6>
+                                    
+                                    <!-- Display each comment related to the message -->
+                                    {% for comment in message.comments.all %}
+                                        <div class="border rounded p-3 mb-3">
+                                            <p class="mb-1"><strong>{{ comment.user.username }}:</strong> {{ comment.content }}</p>
+                                            <small class="text-muted">{{ comment.created_at }}</small>
+                
+                                            <!-- Like button for the comment -->
+                                            <div class="d-flex justify-content-start align-items-center mt-2">
+                                                <a href="{% url "comment-likes" comment.id %}" class="btn btn-outline-primary btn-sm me-2">
+                                                    Like
+                                                </a>
+                                                <span>{{ comment.likes.all.count }} Likes</span> <!-- Placeholder for number of likes -->
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+            
+                                <!-- Comment Form for each message -->
+                                <form action="{% url "comment"  message.id %}" method="POST" class="mt-3">
+                                    {% csrf_token %}
+                                    <label for="comment" class="form-label">Add a Comment</label>
+                                    {{ cmtForm.content }}
+                                    <button class="btn btn-primary btn-sm mt-2" type="submit">Post Comment</button>
+                                </form>
+                            </div>
+                        
+                        </div>
+                        <!-- End of each message section -->
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    
+        <div class="container">
+            <div class="row justify-content-lg-center">
+                <div class="col-12 col-lg-9">
+                    <div class="bg-white border rounded shadow-sm overflow-hidden">
+                        <form action="{% url "feed" %}" method="POST">
+                            {% csrf_token %}
+                            <div class="row gy-4 gy-xl-5 p-4 p-xl-5">
+                                <div class="col-12">
+                                    <label for="comment" class="form-label">Message Heading <span class="text-danger">*</span></label>
+                                    {{ msgForm.title }}
+                                </div>
+                                <div class="col-12">
+                                    <label for="comment" class="form-label">Message <span class="text-danger">*</span></label>
+                                    {{ msgForm.content }}
+                                </div>
+                                <div class="col-12">
+                                    <div class="d-grid">
+                                        <button class="btn btn-primary btn-lg" type="submit">Post Message</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
